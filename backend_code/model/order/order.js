@@ -6,6 +6,7 @@ const Order = new mongoose.Schema(
     totalAmount: { type: String },
     name: { type: String },
     address: { type: String },
+    payment_id: { type: String },
     contact: { type: String },
     status: { type: String, default: "active" },
   },

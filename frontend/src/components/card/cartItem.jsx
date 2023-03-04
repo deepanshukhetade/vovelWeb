@@ -5,7 +5,7 @@ const CartItem = ({ item }) => {
   const ctxCart = useContext(CartContext);
   const handleAdd = () => {
     ctxCart.addToCart({
-      id: item.id,
+      id: item._id,
       name: item.title,
       image: item.image,
       amount: 1,

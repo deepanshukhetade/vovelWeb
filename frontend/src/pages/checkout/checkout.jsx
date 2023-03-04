@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import * as yup from "yup";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -36,25 +36,86 @@ const Checkout = () => {
   }, []);
 
   const onSubmit = async (data) => {
-    try {
-      const payload = {
-        items: ctxCart.items,
-        totalAmount: ctxCart.totalAmount,
-        name: data.name,
-        address: data.address,
-        contact: data.phone,
-      };
-      const result = await axios.post(`${url}/api/order/createOrder`, payload);
-      swal("Success", "Order is successfully placed.", "success");
-    } catch (error) {
-      swal("Warning!", "Unable to create order!", "warning");
-    }
+    const payload = {
+      items: ctxCart.items,
+      totalAmount: parseInt(ctxCart.totalAmount * 81),
+      name: data.name,
+      address: data.address,
+      contact: data.phone,
+    };
+    displayRazorpay(payload);
     ctxCart.emptyCard();
     reset({
       name: "",
       address: "",
       phone: "",
     });
+  };
+
+  const loadScript = (src) => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = () => {
+        resolve(true);
+      };
+      script.onerror = () => {
+        resolve(false);
+      };
+      document.body.appendChild(script);
+    });
+  };
+
+  const displayRazorpay = async (data) => {
+    const res = await loadScript(
+      "https://checkout.razorpay.com/v1/checkout.js"
+    );
+    if (!res) {
+      alert("RazerPay SDK Fail to Load");
+      return;
+    }
+
+    var options = {
+      key: "rzp_test_a5X6TOAcia6N1e",
+      amount: parseInt(data.totalAmount * 100),
+      currency: "INR",
+      name: "Fake Shop",
+      description: "Thank you for choosing us.",
+      handler: function (response) {
+        handlePaymentVerification(response, data);
+      },
+      prefill: {
+        name: data.name,
+        contact: data.contact,
+      },
+      theme: {
+        color: "#3399cc",
+      },
+    };
+    const paymentObject = new window.Razorpay(options);
+    paymentObject.open();
+  };
+
+  const handlePaymentVerification = async (response, data) => {
+    try {
+      const payload = {
+        ...data,
+        payment_id: response.razorpay_payment_id,
+      };
+      await axios.post(`${url}/api/order/createOrder`, payload);
+      swal({
+        title: "Payment Success",
+        text: "Thank you for Payment",
+        icon: "success",
+        button: "OK",
+      });
+    } catch (error) {
+      swal({
+        title: "Payment Failed",
+        icon: "danger",
+        button: "OK",
+      });
+    }
     navigate("/");
   };
 

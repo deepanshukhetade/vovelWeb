@@ -11,10 +11,12 @@
   "dependencies": {
     "@hookform/resolvers": "^2.9.11",
     "axios": "^1.3.4",
+    "randombytes": "^2.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.43.2",
     "react-router-dom": "^6.8.1",
+    "rollup-plugin-node-builtins": "^2.1.2",
     "sweetalert": "^2.1.2",
     "yup": "^1.0.0"
   },

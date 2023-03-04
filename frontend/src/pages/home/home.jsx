@@ -12,8 +12,10 @@ const Home = () => {
 
   const getProducts = async () => {
     try {
-      const result = await axios.get(`${url}/api/product/getAllProduct`);
-      setProduct(result.data.data);
+      // const result = await axios.get(`${url}/api/product/getAllProduct`);
+      // setProduct(result.data.data);
+      const result = await axios.get("https://fakestoreapi.com/products");
+      setProduct(result.data);
     } catch (error) {
       console.log("Error", error);
     }
